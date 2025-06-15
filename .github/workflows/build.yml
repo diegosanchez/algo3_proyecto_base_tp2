@@ -11,7 +11,16 @@ jobs:
       - name: Clean Install (skipping tests)
         run: mvn clean -DskipTests | grep -v 'Download'
       - name: Build and Test Run 
-        run: mvn test | grep -v 'Download'
+        run: mvn test jacoco:report | grep -v 'Download'
       - name: Run Mutation Test
         run: mvn -q test-compile org.pitest:pitest-maven:mutationCoverage
-        
+      - name: Install Node.js (silent)
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq curl gnupg
+          curl -fsSL https://deb.nodesource.com/setup_18.x | bash - > /dev/null
+          apt-get install -y -qq nodejs
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          verbose: true
